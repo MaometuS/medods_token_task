@@ -1,2 +1,24 @@
 # medods_token_task
-Token task for medods recruitment
+Тестовая задача для Medods Golang Junior
+
+Для запуска:
+
+`docker compose up`
+
+Эндпоинт для генерации новых токенов:
+
+`http://localhost:8080/get_tokens?uuid=9a519459-2f0c-44aa-b8c5-59a9984b3f5f`
+
+где uuid для  указания уникального идентификатора токена
+
+Эндпоинт для обновления токенов:
+
+`http://localhost:8080/refresh_tokens`
+
+ActiveToken задается в хедере Authorization, в виде Bearer токена:
+
+`Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpcCI6IjE3Mi4xOC4wLjEiLCJ0b2tlbl9pZCI6ImQxN2E1NWI0LWNkZDUtNDQyNC04MDdlLTc4NWM3OGUzOGU5NSIsInV1aWQiOiIyNmNkY2M0YS1iZjM0LTQ1OTUtOTQxNC03YzM0YzcyZDRmMzQifQ.IJ-CmakuY9wgSMaebpuHMk8_3blZuUWoipaoXTRGyoz-rDJ4AhV8OgtpvteKmQi1q3TiXX_VBWlk-YlWOLQ9OA`
+
+RefreshToken задется в хедере Refresh-Token:
+
+`ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBjQ0k2SWpFM01pNHhPQzR3TGpFaUxDSjBiMnRsYmw5cFpDSTZJbVF4TjJFMU5XSTBMV05rWkRVdE5EUXlOQzA0TURkbExUYzROV00zT0dVek9HVTVOU0lzSW5WMWFXUWlPaUl5Tm1Oa1kyTTBZUzFpWmpNMExUUTFPVFV0T1RReE5DMDNZek0wWXpjeVpEUm1NelFpZlEuSUotQ21ha3VZOXdnU01hZWJwdUhNazhfM2JsWnVVV29pcGFvWFRSR3lvei1yREo0QWhWOE9ndHB2dGVLbVFpMXEzVGlYWF9WQldsay1ZbFdPTFE5T0E`

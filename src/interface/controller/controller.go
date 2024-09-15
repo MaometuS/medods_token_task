@@ -30,6 +30,7 @@ func (c *controller) GetTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"active_token":  activeToken,
 		"refresh_token": refreshToken,
@@ -52,6 +53,7 @@ func (c *controller) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"active_token":  activeToken,
 		"refresh_token": refreshToken,

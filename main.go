@@ -1,8 +1,7 @@
 package main
 
 import (
-	"context"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"fmt"
 	"github.com/maometus/medods_token_task/src/entity/config"
 	"github.com/maometus/medods_token_task/src/infrastructure"
 	"github.com/maometus/medods_token_task/src/interface/controller"
@@ -14,7 +13,7 @@ import (
 func main() {
 	conf := config.NewConfig()
 
-	db, err := pgxpool.New(context.Background(), "")
+	db, err := infrastructure.NewDatabase(conf)
 	if err != nil {
 		panic("error db")
 	}
@@ -26,5 +25,6 @@ func main() {
 
 	mux := infrastructure.NewRouter(app)
 
+	fmt.Println("Listening on 8080")
 	http.ListenAndServe(":8080", mux)
 }

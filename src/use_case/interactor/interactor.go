@@ -7,7 +7,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/maometus/medods_token_task/src/entity/models"
 	"github.com/maometus/medods_token_task/src/use_case"
+	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
+	"slices"
 	"time"
 )
 
@@ -47,8 +49,10 @@ func (i *interactor) GetTokens(ctx context.Context, id string, ip string) (strin
 	}
 
 	refreshToken := base64.StdEncoding.EncodeToString([]byte(refreshTokenJWT))
+	refreshTokenReversed := []byte(refreshToken)
+	slices.Reverse(refreshTokenReversed)
 
-	refreshTokenEncrypted, err := bcrypt.GenerateFromPassword([]byte(refreshToken), 4)
+	refreshTokenEncrypted, err := bcrypt.GenerateFromPassword(refreshTokenReversed[:72], 4)
 	if err != nil {
 		return "", "", err
 	}
@@ -58,6 +62,7 @@ func (i *interactor) GetTokens(ctx context.Context, id string, ip string) (strin
 		TokenID:   newTokenID,
 		Valid:     true,
 		UpdatedAt: time.Now(),
+		CreatedAt: time.Now(),
 	})
 	if err != nil {
 		return "", "", err
@@ -78,6 +83,9 @@ func (i *interactor) RefreshTokens(ctx context.Context, activeToken string, refr
 	}
 
 	refreshTokenClaims, err := i.repository.GetJWTClaims(string(refreshTokenJWT))
+	if err != nil {
+		return "", "", err
+	}
 
 	activeTokenID, ok := activeTokenClaims["token_id"].(string)
 	if !ok {
@@ -109,7 +117,10 @@ func (i *interactor) RefreshTokens(ctx context.Context, activeToken string, refr
 		return "", "", err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(savedToken.Token), []byte(refreshToken))
+	refreshTokenReversed := []byte(refreshToken)
+	slices.Reverse(refreshTokenReversed)
+
+	err = bcrypt.CompareHashAndPassword([]byte(savedToken.Token), refreshTokenReversed[:72])
 	if err != nil {
 		return "", "", err
 	}
@@ -119,6 +130,7 @@ func (i *interactor) RefreshTokens(ctx context.Context, activeToken string, refr
 	}
 
 	savedToken.Valid = false
+	savedToken.UpdatedAt = time.Now()
 	err = i.repository.UpdateToken(ctx, savedToken)
 	if err != nil {
 		return "", "", err
@@ -134,4 +146,22 @@ func (i *interactor) RefreshTokens(ctx context.Context, activeToken string, refr
 
 func NewInteractor(rep use_case.Repository) Interactor {
 	return &interactor{rep}
+}
+
+type InteractorMock struct {
+	mock.Mock
+}
+
+func (i *InteractorMock) GetTokens(ctx context.Context, id string, ip string) (string, string, error) {
+	args := i.Called(ctx, id, ip)
+	return args.String(0), args.String(1), args.Error(2)
+}
+
+func (i *InteractorMock) RefreshTokens(ctx context.Context, activeToken string, refreshToken string, ip string) (string, string, error) {
+	args := i.Called(ctx, activeToken, refreshToken, ip)
+	return args.String(0), args.String(1), args.Error(2)
+}
+
+func NewInteractorMock() *InteractorMock {
+	return &InteractorMock{}
 }

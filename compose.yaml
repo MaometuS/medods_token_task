@@ -1,0 +1,22 @@
+services:
+  tokenizer:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      - JWT_SECRET=jwt_secret_123
+      - CONN_STR=postgres://postgres:password@postgres:5432
+
+  postgres:
+    image: "postgres:16-alpine"
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+      - tokenizer_db:/var/lib/postgresql/data
+
+volumes:
+  tokenizer_db:
